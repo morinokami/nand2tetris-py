@@ -562,15 +562,4 @@ def DMux8Way(_in, sel):
 
 if __name__ == '__main__':
     import doctest
-    #doctest.testmod(verbose=True)
     doctest.testmod()
-
-
-
-
-
-
-
-
-
-
