@@ -306,11 +306,12 @@ def Mux4Way16(a, b, c, d, sel):
     [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
     """
 
-    out = Mux16(Mux16(a, b, sel[1]), Mux16(c, d, sel[1]), sel[0])
+    sel.reverse()
+    out = Mux16(Mux16(a, b, sel[0]), Mux16(c, d, sel[0]), sel[1])
     return out
 
 def Mux8Way16(a, b, c, d, e, f, g, h, sel):
-    """Mux8Way16 (8-way Multiplexer)
+    """Mux8Way16 (8-way Multiplexer) gate:
        If sel=000 then out=a else if sel=001 then out=b
        else if sel=010 out=c ... else if sel=111 then out=h
 
@@ -480,7 +481,7 @@ def Mux8Way16(a, b, c, d, e, f, g, h, sel):
     return out
 
 def DMux4Way(_in, sel):
-    """DMux4Way (4-way Demultiplexor):
+    """DMux4Way (4-way Demultiplexor) gate:
        If sel=00 then {a=in, b=c=d=0}
        else if sel=01 then {b=in, a=c=d=0}
        else if sel=10 then {c=in, a=b=d=0}
@@ -504,55 +505,60 @@ def DMux4Way(_in, sel):
     [0, 0, 0, 1]
     """
 
-    pass
+    sel.reverse()
+    e1, e2 = DMux(_in, sel[1])
+    a, b = DMux(e1, sel[0])
+    c, d = DMux(e2, sel[0])
 
-    # return [a, b, c, d]
+    return [a, b, c, d]
 
 def DMux8Way(_in, sel):
-    """DMux8Way (8-way Demultiplexor):
+    """DMux8Way (8-way Demultiplexor) gate:
        If sel=000 then {a=in, b=c=d=e=f=g=h=0}
        else if sel=001 then {b=in, a=c=d=e=f=g=h=0}
        else if sel=010 ...
        ...
        else if sel=111 then {h=in, a=b=c=d=e=f=g=0}.
 
-    >>> DMux8Way(0, [0, 0])
+    >>> DMux8Way(0, [0, 0, 0])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [0, 1])
+    >>> DMux8Way(0, [0, 0, 1])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [1, 0])
+    >>> DMux8Way(0, [0, 1, 0])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [1, 1])
+    >>> DMux8Way(0, [0, 1, 1])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [0, 0])
+    >>> DMux8Way(0, [1, 0, 0])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [0, 1])
+    >>> DMux8Way(0, [1, 0, 1])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [1, 0])
+    >>> DMux8Way(0, [1, 1, 0])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(0, [1, 1])
+    >>> DMux8Way(0, [1, 1, 1])
     [0, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(1, [0, 0])
+    >>> DMux8Way(1, [0, 0, 0])
     [1, 0, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(1, [0, 1])
+    >>> DMux8Way(1, [0, 0, 1])
     [0, 1, 0, 0, 0, 0, 0, 0]
-    >>> DMux8Way(1, [1, 0])
+    >>> DMux8Way(1, [0, 1, 0])
     [0, 0, 1, 0, 0, 0, 0, 0]
-    >>> DMux8Way(1, [1, 1])
+    >>> DMux8Way(1, [0, 1, 1])
     [0, 0, 0, 1, 0, 0, 0, 0]
-    >>> DMux8Way(1, [0, 0])
+    >>> DMux8Way(1, [1, 0, 0])
     [0, 0, 0, 0, 1, 0, 0, 0]
-    >>> DMux8Way(1, [0, 1])
+    >>> DMux8Way(1, [1, 0, 1])
     [0, 0, 0, 0, 0, 1, 0, 0]
-    >>> DMux8Way(1, [1, 0])
+    >>> DMux8Way(1, [1, 1, 0])
     [0, 0, 0, 0, 0, 0, 1, 0]
-    >>> DMux8Way(1, [1, 1])
+    >>> DMux8Way(1, [1, 1, 1])
     [0, 0, 0, 0, 0, 0, 0, 1]
     """
 
-    pass
+    i1, i2 = DMux(_in, sel[0])
+    a, b, c, d = DMux4Way(i1, sel[1:])
+    e, f, g, h = DMux4Way(i2, sel[1:])
+    return [a, b, c, d, e, f, g, h]
 
-    # return [a, b, c, d, e, f, g, h]
 
 if __name__ == '__main__':
     import doctest
